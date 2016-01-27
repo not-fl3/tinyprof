@@ -1,0 +1,7 @@
+[package]
+name = "benchmarker"
+version = "0.1.0"
+authors = ["fl3"]
+
+[dependencies]
+time = "*"
