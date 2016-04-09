@@ -1,6 +1,23 @@
-# benchmarker
-Very simple script macro for printing time of execution any parts of code.
+# tinyprof
 
-```
-let x = 0 + benchmark!(1 + 2, "1 + 2 time: {}");
+Simple region based profiler.
+
+```rust
+{
+    profile_region!("Root region");
+
+    // something heavy
+
+    {
+        profiler_region!("sub region 1");
+        // something heavy
+    }
+
+    {
+        profiler_region!("sub region 2");
+        // something heavy
+    }
+
+    profiler_next_frame();
+}
 ```

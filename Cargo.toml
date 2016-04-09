@@ -1,7 +1,13 @@
 [package]
-name = "benchmarker"
-version = "0.1.0"
-authors = ["fl3"]
+name = "tinyprof"
+description = "Tiny realtime frame profiler, well used with tinyecs"
+repository = "https://github.com/not-fl3/tinyprof.git"
+keywords = ["profiler"]
+authors = ["not.fl3@gmail.com"]
+license = "MIT"
+version = "0.0.1"
+
 
 [dependencies]
-time = "*"
+time = "0.1"
+lazy_static = "0.1.15"
