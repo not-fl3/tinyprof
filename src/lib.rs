@@ -15,6 +15,11 @@ mod region;
 mod reporter;
 mod counters;
 
+#[cfg(feature="prof")]
+#[macro_use] mod macros;
+#[cfg(not(feature="prof"))]
+#[macro_use] mod macros_dummy;
+
 pub use counters::FrameReport;
 pub use profiler::Profiler;
 pub use thread_storage::{next_frame, set_thread_name, set_variable_value};
