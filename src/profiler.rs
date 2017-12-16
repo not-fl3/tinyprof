@@ -1,3 +1,5 @@
+#![cfg_attr(not(feature="prof"),  allow(dead_code))]
+
 use std::sync::mpsc;
 use failure::Error;
 use counters::FrameReport;

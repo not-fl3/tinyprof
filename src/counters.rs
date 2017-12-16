@@ -1,8 +1,10 @@
 use reporter::Reporter;
 
+use std::collections::HashMap;
+
 pub(crate) struct Counter {
     pub(crate) name: String,
-    pub(crate) time: Option<f64>,
+    pub(crate) id: &'static str,
     pub(crate) reporter: Reporter,
     pub(crate) counters: Vec<Counter>,
     pub(crate) parent: *mut Counter,
@@ -10,17 +12,24 @@ pub(crate) struct Counter {
 
 #[derive(Clone, Debug)]
 pub struct ReportCounter {
+    /// Name of profiling region, provided by user in profile_region!().
     pub name: String,
-    pub duration: f64,
-    pub counters: Vec<ReportCounter>
+    /// Unique region id. Actually its filename + line of profile_region!() invocation.
+    pub id: &'static str,
+    /// Seconds spent on that region
+    /// None means that region is not finished yet.
+    pub duration: Option<f64>,
+    /// Counters occured inside that region.
+    pub counters: Vec<ReportCounter>,
 }
 
-impl<'a> From<&'a Counter> for ReportCounter {
-    fn from(counter: &Counter) -> ReportCounter {
+impl<'a> From<&'a mut Counter> for ReportCounter {
+    fn from(counter: &mut Counter) -> ReportCounter {
         ReportCounter {
             name: counter.name.to_string(),
-            duration: counter.time.unwrap_or(0.0),
-            counters : counter.counters.iter().map(From::from).collect()
+            id: counter.id,
+            duration: counter.reporter.duration(),
+            counters: counter.counters.iter_mut().map(From::from).collect(),
         }
     }
 }
@@ -28,15 +37,23 @@ impl<'a> From<&'a Counter> for ReportCounter {
 #[derive(Clone, Debug)]
 pub struct FrameReport {
     pub thread_name: String,
+    pub frame: i32,
     pub counters: Vec<ReportCounter>,
+    pub variables: HashMap<String, f32>,
 }
 
 impl FrameReport {
-    pub(crate) fn from_thread_data(thread_name: &str, counters: &[Counter]) -> FrameReport {
+    pub(crate) fn from_thread_data(
+        thread_name: &str,
+        frame: i32,
+        counters: &mut [Counter],
+        variables: &HashMap<String, f32>,
+    ) -> FrameReport {
         FrameReport {
-            thread_name : thread_name.to_string(),
-            counters : counters.iter().map(From::from).collect()
+            frame: frame,
+            variables: variables.clone(),
+            thread_name: thread_name.to_string(),
+            counters: counters.iter_mut().map(From::from).collect(),
         }
     }
 }
-

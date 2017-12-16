@@ -1,5 +1,5 @@
-use frontends::ProfilerFrontend;
-use counters::{FrameReport, ReportCounter};
+use ProfilerFrontend;
+use tinyprof::{FrameReport, ReportCounter};
 
 use std::collections::{HashMap, HashSet};
 
@@ -11,6 +11,7 @@ use termion::input::TermRead;
 
 use std::sync::mpsc::*;
 
+/// Termion frontend options
 pub struct TermionBuildParams {
     /// Width of profiler area.
     /// Will be half of the screen instead.
@@ -18,7 +19,8 @@ pub struct TermionBuildParams {
 
     /// Width of logger area.
     /// Will be (width of the screen - profiler_width) instead.
-    /// Setting both profiler and logger width may be a workaround for "Inappropriate ioctl for device" error.
+    /// Setting both profiler and logger width may be a workaround
+    /// for "Inappropriate ioctl for device" error.
     pub logger_width: Option<u16>,
 
     /// Height of entire output area.
@@ -338,6 +340,14 @@ impl TermionFrontend {
         );
 
         self.terminal.put_string(0, "VARIABLES:", None);
+        for thread in self.thread_data.values() {
+            self.terminal.put_string(0, &thread.thread_name, None);
+            for variable in thread.variables.iter() {
+                self.terminal
+                    .put_string(0, &format!("{}: {}", variable.0, variable.1), None);
+            }
+        }
+
 
         self.terminal.end_text_area();
 
@@ -389,8 +399,8 @@ fn draw_counter_recursive(
 
     if terminal.put_string(
         shift,
-        &format!("{}: {:.3}ms", counter.name, counter.duration),
-        Some(format!("{}{}", shift, counter.name)),
+        &format!("{}: {:.3}ms", counter.name, counter.duration.unwrap_or(0.0)),
+        Some(counter.id.to_string()),
     ) {
         for counter in &counter.counters {
             lines += draw_counter_recursive(terminal, counter, shift + 4);
