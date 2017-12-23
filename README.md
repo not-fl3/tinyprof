@@ -2,6 +2,9 @@
 
 Simple region based profiler. Running with application and displaying profiling information to embedded frontend.
 
+![imgui!](https://i.imgur.com/rqZB5pN.gif)
+![imgui!](https://i.imgur.com/zKyTvBL.gif)
+
 # Goals
 
 - No overhead or any additional code when compiled-out.

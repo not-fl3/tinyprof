@@ -50,7 +50,7 @@ impl ThreadData {
 pub struct ImguiFrontend {
     threads_data: HashMap<String, ThreadData>,
     frames_history: usize,
-    selected_frame: Option<ImguiFrameReport>,
+    selected_frame: Option<usize>,
     pause: bool,
     history_area_width: f32,
     history_area_height: f32,
@@ -97,11 +97,10 @@ impl ImguiFrontend {
                         &thread_name,
                         &thread_data,
                     ) {
-                        self.selected_frame = Some(thread_data.reports[frame].clone());
+                        self.selected_frame = Some(frame);
                         self.pause = true;
                     }
-                    let data = thread_data.reports.front();
-                    if let Some(data) = data {
+                    if let Some(data) = self.get_selected_frame(&thread_data) {
                         draw_report(&data, ui);
                     }
                     ui.separator();
@@ -114,9 +113,7 @@ impl ImguiFrontend {
             .movable(true)
             .build(|| {
                 for (thread_name, thread_data) in &self.threads_data {
-                    let data = self.selected_frame.as_ref().or(thread_data.reports.front());
-
-                    if let Some(data) = data {
+                    if let Some(data) = self.get_selected_frame(&thread_data) {
                         ui.tree_node(im_str!("{}", thread_name)).build(|| {
                             for variable in data.frame.variables.iter() {
                                 ui.text(im_str!("{}: {}", variable.0, variable.1));
@@ -127,6 +124,14 @@ impl ImguiFrontend {
             });
 
         self.truncate();
+    }
+
+    fn get_selected_frame<'a>(&self, thread_data : &'a ThreadData) -> Option<&'a ImguiFrameReport> {
+        if let Some(frame) = self.selected_frame {
+            Some(&thread_data.reports[frame])
+        } else {
+            thread_data.reports.front()
+        }
     }
 }
 
@@ -233,7 +238,7 @@ fn draw_counter_recursive<'a>(counter: &ReportCounter, ui: &Ui<'a>, duration: f6
         None => im_str!("{}: NOT FINISHED", counter.name),
     };
 
-    ui.tree_node(im_str!("{}", counter.id))
+    ui.tree_node(im_str!("{}{}", counter.id, counter.name))
         .label(label)
         .build(|| {
             let duration = counter.duration;
