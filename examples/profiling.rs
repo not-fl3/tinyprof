@@ -1,7 +1,7 @@
 extern crate rand;
 #[macro_use]
 extern crate tinyprof;
-extern crate tinyprof_frontends as frontends;
+extern crate tinyprof_termion as frontend;
 
 use std::thread;
 
@@ -16,7 +16,7 @@ fn main() {
     #[cfg(feature = "prof")]
     let (profiler, mut frontend) = (
         prof::Profiler::new(),
-        frontends::TermionFrontend::new(Default::default()),
+        frontend::TermionFrontend::new(Default::default()),
     );
 
     thread::spawn(|| {
@@ -97,8 +97,6 @@ fn main() {
     loop {
         #[cfg(feature = "prof")]
         {
-            use frontends::ProfilerFrontend;
-
             for report in profiler.receive_reports().into_iter() {
                 frontend.receive_reports(report);
             }
