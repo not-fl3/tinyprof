@@ -5,7 +5,7 @@ repository = "https://github.com/tinyprof/tinyprof.git"
 keywords = ["profiler"]
 authors = ["not.fl3@gmail.com"]
 license = "MIT"
-version = "0.1.0"
+version = "0.1.1"
 
 [dependencies]
 failure = "0.1.0"
