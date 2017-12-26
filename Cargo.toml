@@ -18,5 +18,8 @@ vec_map = "0.8.0"
 rand = "0.3"
 tinyprof_termion = { git = "https://github.com/tinyprof/tinyprof-termion" }
 
+[patch.'https://github.com/tinyprof/tinyprof']
+tinyprof = { path = '.' }
+
 [features]
 prof = []
